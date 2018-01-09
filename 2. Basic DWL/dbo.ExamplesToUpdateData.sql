@@ -1,4 +1,6 @@
 
+/* https://metanit.com/sql/sqlserver/4.7.php */
+
 USE productsdb
 
 /* ADD 5000 TO ALL PRODUCTS PRICE */
