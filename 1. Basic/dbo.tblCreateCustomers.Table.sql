@@ -1,14 +1,18 @@
---create database usersdb
+--CREATE DATABASE usersdb
 
 USE usersdb;
 CREATE TABLE Customers
 (
-	Id INT,
-	Age INT,
-	FirstName NVARCHAR(20),
-	LastName NVARCHAR(20),
+	Id INT IDENTITY,
+	Age INT CONSTRAINT DF_Customer_Age DEFAULT 18,
+	FirstName NVARCHAR(20) NOT NULL,
+	LastName NVARCHAR(20) NOT NULL,
 	Email VARCHAR(30),
-	Phone VARCHAR(20)
+	Phone VARCHAR(20),
+	CONSTRAINT PK_Customer_Id PRIMARY KEY (Id),
+	CONSTRAINT CK_Customer_Age CHECK (Age > 0 AND Age < 100),
+	CONSTRAINT UQ_Customer_Email UNIQUE (Email),
+	CONSTRAINT UQ_Customer_Phone UNIQUE (Phone)
 )
 
-SELECT * FROM Customers
+-- DROP TABLE Customers
