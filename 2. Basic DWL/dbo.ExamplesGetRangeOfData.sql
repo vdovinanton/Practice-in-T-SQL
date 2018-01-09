@@ -1,3 +1,6 @@
+
+/* https://metanit.com/sql/sqlserver/4.4.php */
+
 USE productsdb
 
 SELECT TOP 4 ProductName
