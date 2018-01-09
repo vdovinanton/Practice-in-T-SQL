@@ -1,0 +1,8 @@
+
+/* ALTER TABLE WITH NOT NULL ATTRIBUTE AND VALUE BY DEFAULT */
+/* FOR MORE ACTION EXAPMPLES WITH CHANCHING COLUMNS:
+   https://metanit.com/sql/sqlserver/3.6.php */
+
+USE usersdb
+ALTER TABLE Customers
+ADD Address NVARCHAR(50) NOT NULL DEFAULT 'Неизвестно';
