@@ -35,6 +35,9 @@ FROM Products
 GROUP BY GROUPING SETS((Manufacturer, ProductCount), ProductCount)
 
 /* OVER */
-SELECT ProductName, Manufacturer, ProductCount, COUNT(*) OVER (PARTITION BY Manufacturer) AS Models,
-        SUM(ProductCount) OVER (PARTITION BY Manufacturer) AS Units
+SELECT	ProductName, 
+		Manufacturer, 
+		ProductCount, 
+		COUNT(*)			OVER (PARTITION BY Manufacturer)	AS Models,
+        SUM(ProductCount)	OVER (PARTITION BY Manufacturer)	AS Units
 FROM Products
