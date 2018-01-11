@@ -56,3 +56,10 @@ SELECT @avgPrice = AVG(Price)
 FROM Products
 RETURN @avgPrice;
 
+/* USE SP */
+USE productsdb;
+ 
+DECLARE @result MONEY
+ 
+EXEC @result = GetAvgPrice
+PRINT @result
