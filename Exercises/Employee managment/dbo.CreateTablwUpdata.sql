@@ -43,3 +43,6 @@ INSERT INTO Employees(SSN,Name,LastName,Department) VALUES('654873219','Zacary',
 INSERT INTO Employees(SSN,Name,LastName,Department) VALUES('745685214','Eric','Goldsmith',59);
 INSERT INTO Employees(SSN,Name,LastName,Department) VALUES('845657245','Elizabeth','Doe',14);
 INSERT INTO Employees(SSN,Name,LastName,Department) VALUES('845657246','Kumar','Swamy',14);
+
+SELECT * FROM Employees
+SELECT * FROM Departments
