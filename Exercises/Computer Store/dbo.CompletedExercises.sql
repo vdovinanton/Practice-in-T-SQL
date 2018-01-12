@@ -64,7 +64,6 @@ select Name, Price from Products
 where Price = (select min(price) from Products)
 
 --16. Select the name of each manufacturer along with the name and price of its most expensive product.
---Выберите имя каждого manufacture вместе с именем и ценой самого дорогого product.
 select	Manufacturers.Name as ManufacturersName, 
 		Products.Name as ProductsName, 
 		Products.Price 
