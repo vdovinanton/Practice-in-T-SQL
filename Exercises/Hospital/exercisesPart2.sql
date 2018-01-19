@@ -4,23 +4,23 @@ USE TheHospital
 --1. Write a query in SQL to find all the information of the nurses who are yet to be registered.
 SELECT * FROM Nurse
 	WHERE Registered = 0
-GO
+;
 
 --2. Write a query in SQL to find the name of the nurse who are the head of their department.
 SELECT * FROM Nurse
 	WHERE Position LIKE '%Head%'
-GO
+;
 
 --3. Write a query in SQL to obtain the name of the physicians who are the head of each department.
 SELECT ph.Name as PhysicianName FROM Physician as ph
 	JOIN Department as dp ON dp.Head = ph.EmployeeID
-GO
+;
 
 --4. Write a query in SQL to count the number of patients who taken appointment with at least one physician.
 SELECT Date FROM Patient AS PAT -- not correct
 	JOIN Prescribes AS pre ON PRE.Patient = PAT.SSN
 	WHERE pre.Appointment IS NOT NULL
-GO
+;
 SELECT count(DISTINCT patient) AS "No. of patients taken at least one appointment"
 FROM appointment;
 
@@ -28,7 +28,7 @@ FROM appointment;
 SELECT bl.BlockCode, bl.BlockFloor FROM Block as bl
 	JOIN Room AS rm ON rm.BlockCode = bl.BlockCode AND rm.BlockFloor = bl.BlockFloor
 	WHERE rm.RoomNumber = 212
-GO
+;
 SELECT blockfloor AS "Floor", -- second resolve
        blockcode AS "Block"
 FROM room
@@ -37,24 +37,24 @@ WHERE roomnumber = 212;
 --6. Write a query in SQL to count the number available rooms.
 SELECT COUNT(*) FROM Room
 	WHERE Room.Unavailable = 0
-GO
+;
 
 --7. Write a query in SQL to count the number of unavailable rooms.
 SELECT COUNT(*) FROM Room
 	WHERE Room.Unavailable = 1
-GO
+;
 
 --8**. Write a query in SQL to obtain the name of the physician and the departments they are affiliated with.
 SELECT ph.Name as PhysitionName, dp.Name as DepartmentName 
 	FROM Physician as ph, Department as dp, Affiliated_With as afw
 	WHERE afw.Department = dp.DepartmentID AND afw.Physician = ph.EmployeeID
-GO
+;
 
 --9. Write a query in SQL to obtain the name of the physicians who are trained for a special treatement.
 SELECT ph.Name as PhysicianName, pro.Name as ProcedureName FROM Trained_In as tr -- first solution
 	JOIN Physician as ph ON ph.EmployeeID = tr.Physician
 	JOIN Procedures as pro ON pro.Code = tr.Treatment
-GO
+;
 
 --10. Write a query in SQL to obtain the name of the physicians with department who are yet to be affiliated.
 --Напишите запрос в SQL, чтобы получить имя врачей с отделом, которые еще не подключены.
@@ -63,7 +63,7 @@ SELECT ph.Name as PhysitionName--, dp.Name as DepartmenName
 	JOIN Affiliated_With as afw ON afw.Physician = ph.EmployeeID
 	JOIN Department as dp ON afw.Department = dp.DepartmentID
 	WHERE PrimaryAffiliation = 0
-GO
+;
 
 --11. Write a query in SQL to obtain the name of the physicians who are not a specialized physician. 
 SELECT ph.Name, ph.Position
@@ -72,7 +72,7 @@ SELECT ph.Name, ph.Position
 		(
 			SELECT Physician FROM Trained_In
 		)
-GO
+;
 
 --12. Write a query in SQL to obtain the name of the patients with their physicians by whom they got their preliminary treatement.
 SELECT phy.Name as PhysicionName, pat.Name as PatientName -- frist solution
@@ -117,7 +117,7 @@ JOIN appointment a ON p.ssn = a.patient;
 --16. Write a query in SQL to find the name of the nurses and the room scheduled, where they will assist the physicians.
 SELECT n.Name, a.ExaminationRoom FROM dbo.Appointment a
     JOIN dbo.Nurse n ON a.PrepNurse = n.EmployeeID
-GO
+;
 
 --17. Write a query in SQL to find the name of the patients who taken the appointment on the 25th of April at 10 am, and also display their physician, assisting nurses and room no.
 SELECT a.[Start] FROM dbo.Appointment a
@@ -260,15 +260,10 @@ SELECT	p.Name AS PatientName,
 		b.BlockFloor
 	FROM dbo.Patient p
 	JOIN dbo.Physician p2 ON p.PCP = p2.EmployeeID
-	JOIN dbo.Appointment a ON p.SSN = a.Patient
-		JOIN dbo.Nurse n ON a.PrepNurse = n.EmployeeID
-		JOIN dbo.Undergoes u ON p.SSN = u.Patient
+	JOIN dbo.Undergoes u ON p.SSN = u.Patient
+	LEFT JOIN dbo.Nurse n ON u.AssistingNurse = n.EmployeeID	-- confused
 	JOIN Procedures pro ON pro.Code = u.Procedures
 	JOIN dbo.Stay s ON p.SSN = s.Patient
 	JOIN Room r ON	r.RoomNumber = s.Room
 	JOIN dbo.Block b ON r.BlockFloor = b.BlockFloor AND r.BlockCode = b.BlockCode
-
-	SELECT * FROM dbo.Patient p
-
-
 
