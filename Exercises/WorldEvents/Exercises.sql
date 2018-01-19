@@ -198,9 +198,50 @@ SELECT	te.EventName,
 ;
 
 --18. Create a query to show the day of the week and also the day number on which each event occurred:
+/*
+	-	That mercifully there weren't any events on Friday the 13th;
+	-	That there was one event on Thursday 12th (the day before); and
+	-	That there were two events on Saturday the 14th (the day after).
+*/
 -- https://www.wiseowl.co.uk/training/exercises/ex-4118.htm
 SELECT	te.EventName,
-		te.EventDate,
-		DATENAME(dw, te.EventDate) AS 'DayOfWeek',
-		DAY(te.EventDate) AS 'Day number'
+			te.EventDate,
+			DATENAME(dw, te.EventDate) AS 'DayOfWeek',
+			DAY(te.EventDate) AS 'Day number'
+		FROM dbo.tblEvent te
+	;
+-- 1
+SELECT	te.EventName,
+			te.EventDate,
+			DATENAME(dw, te.EventDate) AS 'DayOfWeek',
+			DAY(te.EventDate) AS 'Day number'
+		FROM dbo.tblEvent te
+	WHERE DATEPART(dw, te.EventDate) = 5 AND DAY(te.EventDate) = 12
+-- 2
+SELECT	te.EventName,
+			te.EventDate,
+			DATENAME(dw, te.EventDate) AS 'DayOfWeek',
+			DAY(te.EventDate) AS 'Day number'
+		FROM dbo.tblEvent te
+	WHERE DATEPART(dw, te.EventDate) = 6 AND DAY(te.EventDate) = 13
+-- 3
+SELECT	te.EventName,
+			te.EventDate,
+			DATENAME(dw, te.EventDate) AS 'DayOfWeek',
+			DAY(te.EventDate) AS 'Day number'
+		FROM dbo.tblEvent te
+	WHERE DATEPART(dw, te.EventDate) = 7 AND DAY(te.EventDate) = 14
+
+--19. Use this nugget of information to create a query listing out each event with the length of its name, with the "shortest event" first:
+-- https://www.wiseowl.co.uk/training/exercises/ex-4109.htm
+SELECT te.EventName, LEN(te.EventName) AS 'Length of name' 
+	FROM dbo.tblEvent te
+	ORDER BY LEN(te.EventName)
+;
+
+--20 Create a query to show the day of the week and also the day number on which each event occurred:
+-- https://www.wiseowl.co.uk/training/exercises/ex-4118.htm
+GO
+SELECT	te.EventName, -- not finished
+		( DATENAME(dw, te.EventDate) + ' ' + CONVERT(nvarchar(10), DAY(te.EventDate)) + ' ' + DATENAME(month, te.EventDate) + ' ' + CONVERT(nvarchar(10), YEAR(te.EventDate)) ) as 'Full date'
 	FROM dbo.tblEvent te
