@@ -240,8 +240,18 @@ SELECT te.EventName, LEN(te.EventName) AS 'Length of name'
 ;
 
 --20 Create a query to show the day of the week and also the day number on which each event occurred:
--- https://www.wiseowl.co.uk/training/exercises/ex-4118.htm
+-- https://www.wiseowl.co.uk/training/exercises/ex-4119.htm
 GO
-SELECT	te.EventName, -- not finished
-		( DATENAME(dw, te.EventDate) + ' ' + CONVERT(nvarchar(10), DAY(te.EventDate)) + ' ' + DATENAME(month, te.EventDate) + ' ' + CONVERT(nvarchar(10), YEAR(te.EventDate)) ) as 'Full date'
+SELECT	te.EventName,
+		( DATENAME(dw, te.EventDate) + ' ' + CONVERT(nvarchar(10), DAY(te.EventDate)) 
+		+ 
+		(
+			CASE DAY(te.EventDate)
+				WHEN 1 THEN 'st'
+				WHEN 2 THEN 'nd'
+				WHEN 3 THEN 'sd'
+				ELSE 'th'
+			END
+		) + ' '
+		+ DATENAME(month, te.EventDate) + ' ' + CONVERT(nvarchar(10), YEAR(te.EventDate)) ) as 'Full date'
 	FROM dbo.tblEvent te
