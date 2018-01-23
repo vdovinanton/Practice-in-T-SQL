@@ -210,8 +210,8 @@ WITH q1 AS
 	(
 		SELECT	(CASE
 					WHEN year(te.EventDate)	between 1700 and 1799 THEN '18th '
-					WHEN year(te.EventDate)	between 1900 and 1999 THEN '19th '
-					WHEN year(te.EventDate)	between 2000 and 1999 THEN '20th '
+					WHEN year(te.EventDate)	between 1800 and 1899 THEN '19th '
+					WHEN year(te.EventDate)	between 1900 and 1999 THEN '20th '
 					WHEN year(te.EventDate)	between 2000 and 2099 THEN '21th '
 					ELSE NULL
 				END + 'century') ct,
@@ -224,3 +224,18 @@ SELECT	q.ct AS Century,
 	GROUP BY q.ct
 	ORDER BY q.ct
 ;
+
+--17. Create a query based on the companions table, with an outer join to the episode companion table.
+-- https://www.wiseowl.co.uk/training/exercises/ex-4034.htm
+USE DoctorWho
+SELECT tc.* FROM dbo.tblCompanion tc
+	LEFT OUTER JOIN dbo.tblEpisodeCompanion tec ON tec.CompanionId = tc.CompanionId
+;
+
+--18. Design a view, and change its function in script
+-- https://www.wiseowl.co.uk/training/exercises/ex-4039.htm
+SELECT vebfl.* FROM dbo.vwEpisodesByFirstLetter vebfl
+
+--19. Create self-joins between 3 levels of family hierarchies
+-- https://www.wiseowl.co.uk/training/exercises/ex-4124.htm
+SELECT ta.AuthorId, '', ta.AuthorName, '', '' FROM dbo.tblAuthor ta
