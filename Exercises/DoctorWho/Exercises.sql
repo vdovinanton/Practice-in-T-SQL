@@ -239,3 +239,76 @@ SELECT vebfl.* FROM dbo.vwEpisodesByFirstLetter vebfl
 --19. Create self-joins between 3 levels of family hierarchies
 -- https://www.wiseowl.co.uk/training/exercises/ex-4124.htm
 SELECT ta.AuthorId, '', ta.AuthorName, '', '' FROM dbo.tblAuthor ta
+
+--20. Create a view combining tables, and use this in another query
+--    and write a query which selects data from this view to show the number of events by category within Africa:
+-- https://www.wiseowl.co.uk/training/exercises/ex-4131.htm
+USE WorldEvents
+GO
+
+CREATE VIEW vwEverythung AS 
+	SELECT	tc.CategoryName,
+			tc3.ContinentName,
+			tc2.CountryName,
+			te.EventName,
+			te.EventDate
+	FROM dbo.tblEvent te
+		JOIN dbo.tblCategory tc ON te.CategoryID = tc.CategoryID
+		JOIN dbo.tblCountry tc2 ON te.CountryID = tc2.CountryID
+		JOIN dbo.tblContinent tc3 ON tc2.ContinentID = tc3.ContinentID
+
+SELECT ve.CategoryName, count(*) AS NumberEvents 
+	FROM dbo.vwEverythung ve
+	WHERE ve.ContinentName = 'Africa'
+	GROUP BY ve.CategoryName
+	order BY NumberEvents DESC
+
+-- 21. Create a stored procedure called spCalculateAge which:
+/*
+	- Declares an integer variable called @Age
+	- Sets the value of this variable to be the difference in years between your date of birth and today's date (see hint below)
+	- Prints out your age
+*/
+
+USE WorldEvents
+GO
+CREATE PROCEDURE spCalculateAge AS
+	BEGIN
+		DECLARE @Age datetime = year(DateDiff(year, '03/04/1964', GetDate()))
+		PRINT 'Your age is ' + convert(nvarchar(10), @Age)
+	END
+GO
+EXEC spCalculateAge
+
+-- 22. To achieve this, create (in this order) the following views:
+/*
+	- vwEpisodeCompanion: Llist all of the episodes which had only a single companion.
+	- vwEpisodeEnemy: List all of the episodes which had only a single enemy.
+	- vwEpisodeSummary: List all of the episodes which have no corresponding rows in either the vwEpisodeCompanion or vwEpisodeEnemy tables.
+	- Список всех эпизодов, которые не имеют соответствующих строк в таблицах vwEpisodeCompanion или vwEpisodeEnemy.
+*/
+USE WorldEvents
+GO
+
+USE DoctorWho
+GO	
+CREATE VIEW vwEpisodeCompanion AS 
+	SELECT te.* 
+		FROM dbo.tblCompanion tc
+		JOIN dbo.tblEpisodeCompanion tec ON tc.CompanionId IN (SELECT DISTINCT tec.CompanionId FROM dbo.tblEpisodeCompanion tec)
+		JOIN dbo.tblEpisode te ON tec.EpisodeId = te.EpisodeId
+
+CREATE VIEW vwEpisodeEnemy AS 
+	SELECT te2.* 
+		FROM dbo.tblEnemy te
+		JOIN dbo.tblEpisodeEnemy tee ON te.EnemyId IN (SELECT DISTINCT tee2.EpisodeId FROM dbo.tblEpisodeEnemy tee2)
+		JOIN dbo.tblEpisode te2 ON tee.EpisodeId = te2.EpisodeId
+
+CREATE VIEW vwEpisodeSummary AS
+	SELECT vec.* FROM dbo.vwEpisodeCompanion vec
+	UNION
+	SELECT tee.* FROM dbo.vwEpisodeEnemy tee
+
+SELECT ves.EpisodeId, ves.Title 
+	FROM dbo.vwEpisodeSummary ves	
+	ORDER BY ves.Title DESC
