@@ -312,3 +312,183 @@ CREATE VIEW vwEpisodeSummary AS
 SELECT ves.EpisodeId, ves.Title 
 	FROM dbo.vwEpisodeSummary ves	
 	ORDER BY ves.Title DESC
+
+-- 23. Use variables to show details for a given episode number
+-- https://www.wiseowl.co.uk/training/exercises/ex-3968.htm
+
+USE DoctorWho
+GO
+DECLARE	@EpisodeId int = 54
+
+DECLARE @EpisodeName nvarchar(50) = (
+	SELECT te.Title FROM dbo.tblEpisode te
+		WHERE te.EpisodeId = @EpisodeId
+);
+DECLARE @NumberCompanions nvarchar(50) = (
+	SELECT count(*) FROM dbo.tblEpisodeCompanion tec
+		WHERE tec.EpisodeId = @EpisodeId
+);
+DECLARE @NumberEnemies nvarchar(50) = (
+	SELECT count(*) FROM dbo.tblEpisodeEnemy tee
+		WHERE tee.EpisodeId = @EpisodeId
+);
+SELECT 
+	@EpisodeName as Title,
+	@EpisodeId as 'Episode id',
+	@NumberCompanions as 'Number of companions',
+	@NumberEnemies as 'Number of enemies'
+;
+
+-- 24. Create a query which lists out all of the events in the tblEvent table which happened 
+--	   after the last one for country 21 (International) took place
+-- https://www.wiseowl.co.uk/training/exercises/ex-4132.htm
+USE WorldEvents
+GO	
+SELECT te.EventName, te.EventDate, tc.CountryName FROM dbo.tblEvent te
+	JOIN dbo.tblCountry tc ON te.CountryID = tc.CountryID
+	WHERE te.EventDate > (
+		SELECT max(te2.EventDate)
+			FROM dbo.tblEvent te2
+			WHERE te2.CountryID = 21
+	)
+ORDER BY te.EventDate DESC
+
+-- 25. Write a query which lists out countries which have more than 8 events, using a correlated subquery rather than HAVING. 
+-- https://www.wiseowl.co.uk/training/exercises/ex-4133.htm
+USE WorldEvents
+GO
+SELECT tc.CountryName 
+	FROM dbo.tblCountry tc
+	WHERE 8 < (
+		SELECT count(*) 
+			FROM dbo.tblEvent te
+			WHERE te.CountryID = tc.CountryID
+	)
+;
+
+-- 26. The aim of this exercise is to summarise events using the MIN, MAX and COUNT functions:
+-- https://www.wiseowl.co.uk/training/exercises/ex-4202.htm
+USE WorldEvents
+GO
+DECLARE @EarliestDate datetime = (
+	SELECT min(te.EventDate)FROM dbo.tblEvent te
+);
+DECLARE @LatesDate datetime = (
+	SELECT max(te.EventDate)FROM dbo.tblEvent te
+);
+DECLARE @NumberOfEvents int = (
+	SELECT count(te.EventID) FROM dbo.tblEvent te
+);
+DECLARE @EventInfo varchar(100) = N'Summory of events';
+
+SELECT  @EventInfo AS N'Event info',
+		FORMAT( @EarliestDate, 'dd/MM/yyyy', 'en-US') AS N'Earliest Date',
+		FORMAT( @LatesDate, 'dd/MM/yyyy', 'en-US' ) AS N'Lates Date',
+		@NumberOfEvents AS N'Number Of Events'
+;
+
+-- 27.  List events not in the last 30 countries or the last 15 categories
+/*
+	- Country id is not in the list of the last 30 country ids in alphabetical order; and
+	- Category id is not in the list of the last 15 category ids in alphabetical order.
+*/
+-- https://www.wiseowl.co.uk/training/exercises/ex-4134.htm
+
+SELECT te.EventName, te.EventDetails 
+	FROM dbo.tblEvent te
+	WHERE te.CountryID NOT IN (
+		SELECT TOP 30 tc.CountryID 
+			FROM dbo.tblCountry tc
+			ORDER BY tc.CountryName DESC		
+	) AND te.CategoryID NOT IN (
+		SELECT TOP 15 tc.CategoryID 
+			FROM dbo.tblCategory tc
+			ORDER BY tc.CategoryName DESC
+	)
+;
+
+-- 28. Use a variable to accumulate an episode's enemy names
+-- https://www.wiseowl.co.uk/training/exercises/ex-3969.htm
+USE DoctorWho
+GO	
+
+DECLARE @EpisodeId int = 15;
+DECLARE @EnemyList varchar(100) = '';
+
+SELECT @EnemyList = @EnemyList + ', ' + te.EnemyName
+	FROM dbo.tblEnemy te
+		JOIN dbo.tblEpisodeEnemy tee ON te.EnemyId = tee.EnemyId
+	WHERE tee.EpisodeId = 15
+;
+SELECT
+	@EpisodeId AS 'Episode Id',
+	stuff(@EnemyList, 1, 1, '') AS 'Enemy list' -- stuff - remove first character (,)
+;
+
+-- 29. Create a stored procedure to list Matt Smith's Dr. Who episodes
+-- https://www.wiseowl.co.uk/training/exercises/ex-3965.htm
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		AV
+-- Create date: 29.01.18
+-- Description:	List out all of the episodes which featured
+-- =============================================
+CREATE PROCEDURE FindEposedesWith 
+	-- Add the parameters for the stored procedure here
+	@Name nvarchar(10) = 'Matt Smith'
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	SELECT	te.SeriesNumber AS Series,
+			te.EpisodeNumber AS Episode,
+			te.EpisodeDate AS 'Date of episode',
+			td.DoctorName AS Doctor 
+		FROM dbo.tblEpisode te
+			JOIN dbo.tblDoctor td ON te.DoctorId = td.DoctorId AND td.DoctorName = @Name
+	;
+END
+GO
+
+ALTER PROCEDURE [dbo].[FindEposedesWith] 
+	@Name nvarchar(10) = 'Matt Smith'
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	SELECT	te.SeriesNumber AS Series,
+			te.EpisodeNumber AS Episode,
+			te.EpisodeDate AS 'Date of episode',
+			td.DoctorName AS Doctor 
+		FROM dbo.tblEpisode te
+			JOIN dbo.tblDoctor td ON te.DoctorId = td.DoctorId AND td.DoctorName = @Name
+		WHERE year(te.EpisodeDate) = 2012
+	;
+END
+GO
+EXEC FindEposedesWith
+
+-- 30. Using variables to filter a stored procedure
+-- https://www.wiseowl.co.uk/training/exercises/ex-4201.htm
+USE WorldEvents
+GO	
+CREATE PROCEDURE AfterMyBirthDay 
+	@DateAfter int = 2018
+AS
+BEGIN
+	SET NOCOUNT ON;
+	DECLARE @Birthday int = 1992;
+
+	SELECT te.EventName, te.EventDate, tc.CountryName
+		FROM dbo.tblEvent te
+			JOIN dbo.tblCountry tc ON te.CountryID = tc.CountryID 
+		WHERE year(te.EventDate) BETWEEN @Birthday AND @DateAfter
+END
+GO
+EXEC AfterMyBirthDay @DateAfter=2005
+
+PRINT current_query()
