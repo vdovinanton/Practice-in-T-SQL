@@ -26,4 +26,4 @@ ALTER TABLE Customers
 ADD CONSTRAINT CK_Age_Greate_Then_Zaeo CHECK (Age > 0);
 
 --ALTER TABLE Orders
---DROP FK_Orders_To_Customers
+--DROP FK_Orders_To_Customers 
