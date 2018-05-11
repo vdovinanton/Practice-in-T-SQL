@@ -6,3 +6,4 @@
 USE usersdb
 ALTER TABLE Customers
 ADD Address NVARCHAR(50) NOT NULL DEFAULT 'Неизвестно';
+ 
